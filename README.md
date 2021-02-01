@@ -1,6 +1,6 @@
 ### Setup
 
-Put this plguin in your mods folder.
+Put this plugin in your mods folder.
 
 
 ### Usage
