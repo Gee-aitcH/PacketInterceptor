@@ -43,7 +43,8 @@ if (mod != null) {
                     int amount = read.i();
 
                     // Process with the values
-                    Log.info(String.format("[white]%s[white] just requested [accent]%s[] [%s]%s[] from [accent]%s[]", player.name, amount, item.color.toString(), item.name, build.block.name));
+                    Log.info(String.format("[white]%s[white] just requested [accent]%s[] [%s]%s[] from [accent]%s[]", 
+                                player.name, amount, item.color.toString(), item.name, build.block.name));
                 }
 
                 // Set Overwrite to true to overwrite the original process
