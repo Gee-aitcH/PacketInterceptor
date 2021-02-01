@@ -7,8 +7,12 @@ import mindustry.gen.RemoteReadServer;
 import mindustry.net.Packets;
 import mindustry.net.ValidateException;
 import pluginutil.GHPlugin;
+
+import java.util.Arrays;
+
 import static arc.util.Log.debug;
 import static mindustry.Vars.net;
+import static pluginutil.PluginUtil.SendMode.info;
 
 public class PacketInterceptor extends GHPlugin {
 
@@ -29,11 +33,15 @@ public class PacketInterceptor extends GHPlugin {
         net.handleServer(Packets.InvokePacket.class, (con, packet) -> {
             if(con.player == null) return;
             try{
+                byte[] bytes = Arrays.copyOf(packet.bytes, packet.bytes.length);
                 this.read = packet.reader();
                 this.type = packet.type;
                 this.player = con.player;
                 Events.fire(PacketInterceptor.class);
-                if (overwrite) RemoteReadServer.readPacket(read, type, player);
+                if (!overwrite) {
+                    packet.bytes = bytes;
+                    RemoteReadServer.readPacket(packet.reader(), packet.type, con.player);
+                }
                 this.read = null;
                 this.type = -1;
                 this.player = null;
@@ -48,6 +56,7 @@ public class PacketInterceptor extends GHPlugin {
                 }
             }
         });
+        log(info, "Invoke packet listener overwritten.");
     }
 
     public void setOverwrite(boolean overwrite) {
