@@ -1,21 +1,61 @@
 ### Setup
 
-Clone this repository first.
-To edit the plugin display name and other data, take a look at `plugin.json`.
-Edit the name of the project itself by going into `settings.gradle`.
-
-### Basic Usage
-
-Extends `GHPlugin` to go with my way.
-
-### Building a Jar
-
-`gradlew jar` / `./gradlew jar`
-
-Output jar should be in `build/libs`.
+Put this plguin in your mods folder.
 
 
-### Installing
+### Usage
 
-Simply place the output jar from the step above in your server's `config/mods` directory and restart the server.
-List your currently installed plugins/mods by running the `mods` command.
+```java
+// Find the mod
+LoadedMod mod = (LoadedMod)Vars.mods.list().find((m) -> {
+    return m.main != null && m.main.getClass().getSimpleName().equals("PacketInterceptor");
+});
+
+if (mod != null) {
+    try {
+
+        // Get the methods
+        Class<?> cls = mod.main.getClass();
+        Method getRead = cls.getDeclaredMethod("getRead");
+        Method getType = cls.getDeclaredMethod("getType");
+        Method getPlayer = cls.getDeclaredMethod("getPlayer");
+        Method setOverwrite = cls.getDeclaredMethod("setOverwrite", Boolean.TYPE);
+
+        // There will be an Event sent by my plugin, you may use that as trigger.
+        Events.on(cls, (e) -> {
+            try {
+
+                // Get values from plugin
+                Reads read = (Reads)getRead.invoke(mod);
+                int type = (Integer)getType.invoke(mod);
+                Player player = (Player)getPlayer.invoke(mod);
+                if (read == null || type == -1 || player == null) {
+                    Log.info(String.format("Packet data missing, aborted. [%s, %s, %s]", new Object[]{read, type, player}));
+                    return;
+                }
+
+                // Check if it is the right packet type
+                if (type == 38){ // 38: requestItem packet
+
+                    // Read Values
+                    Building build = TypeIO.readBuilding(read);
+                    Item item = TypeIO.readItem(read);
+                    int amount = read.i();
+
+                    // Process with the values
+                    Log.info(String.format("[white]%s[white] just requested [accent]%s[] [%s]%s[] from [accent]%s[]", player.name, amount, item.color.toString(), item.name, build.block.name));
+                }
+
+                // Set Overwrite to true to overwrite the original process
+//                setOverwrite.invoke(mod, true);
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+        });
+        Log.info("Packet interceptor(s) registered.");
+    } catch (Exception e) {
+        Log.warn("An error has occurred while registering packet interceptor(s).");
+        e.printStackTrace();
+    }
+}
+```
