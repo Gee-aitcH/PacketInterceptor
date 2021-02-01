@@ -1,7 +1,7 @@
 {
-  "name": "ExampleGHPlugin",
+  "name": "PacketInterceptor",
   "author": "(G_H)",
-  "main": "exampleghplugin.ExampleGHPlugin",
-  "description": "An example plugin with the application of GH's plugin utils.",
+  "main": "packetinterceptor.PacketInterceptor",
+  "description": "A plugin that intercept packets sent to the server and allows other plugins to process the packets before the server does and deny the execution of the original code.",
   "version": 1.1
 }
