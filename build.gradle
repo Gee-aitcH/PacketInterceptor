@@ -1,35 +1,43 @@
 apply plugin: "java"
 apply plugin: 'maven'
 
-version '1.0'
+version '1.1'
 
 sourceCompatibility = 1.14
 
 sourceSets.main.java.srcDirs = ["src"]
 
-repositories{
+repositories {
     mavenCentral()
-    maven{ url 'https://www.jitpack.io' }
+    maven { url 'https://www.jitpack.io' }
 }
 
-ext{
+ext {
     //the build number that this plugin is made for
-    mindustryVersion = 'v123'
+    mindustryVersion = 'v125'
+    ghpHash = '26b7bd47a0'
+
+    getGHPModule = {
+        if (new File(projectDir.parent, '/GHPluginUtil/').exists())
+            return files("../GHPluginUtil/build/libs/GHPluginUtil.jar")
+        else
+            return "com.github.Gee-aitcH:GHPluginUtil:$ghpHash"
+    }
 }
 
-dependencies{
-    implementation 'com.github.Gee-aitcH:GHPluginUtil:c3ac0590ba'
+dependencies {
+    implementation getGHPModule()
     compileOnly "com.github.Anuken.Arc:arc-core:$mindustryVersion"
     compileOnly "com.github.Anuken.Mindustry:core:$mindustryVersion"
 }
 
-jar{
-    archiveFileName = "${project.archivesBaseName}.jar"
-    from{
-        configurations.runtimeClasspath.collect{it.isDirectory() ? it : zipTree(it)}
+jar {
+    archiveFileName = "${project.archivesBaseName} ${version}.jar"
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
 
-    from(rootDir){
+    from(rootDir) {
         include "plugin.json"
     }
 }
