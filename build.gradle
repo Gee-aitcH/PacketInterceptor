@@ -1,8 +1,6 @@
 apply plugin: "java"
 apply plugin: 'maven'
 
-version '1.1'
-
 sourceCompatibility = 1.14
 
 sourceSets.main.java.srcDirs = ["src"]
@@ -12,7 +10,8 @@ repositories {
     maven { url 'https://www.jitpack.io' }
 }
 
-ext {
+ext{
+    pluginVersion = '1.11'
     //the build number that this plugin is made for
     mindustryVersion = 'v125'
     ghpHash = '26b7bd47a0'
@@ -32,7 +31,7 @@ dependencies {
 }
 
 jar {
-    archiveFileName = "${project.archivesBaseName}_${version}.jar"
+    archiveFileName = "${project.archivesBaseName}_${pluginVersion}.jar"
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }

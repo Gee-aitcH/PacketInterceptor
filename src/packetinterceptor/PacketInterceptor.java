@@ -9,6 +9,7 @@ import mindustry.game.EventType;
 import mindustry.net.Net;
 import mindustry.net.NetConnection;
 import pluginutil.GHPlugin;
+import pluginutil.LogMode;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -24,7 +25,7 @@ public class PacketInterceptor extends GHPlugin {
 
     public PacketInterceptor() {
         super();
-        VERSION = "1.1";
+        VERSION = "1.11";
     }
 
     @Override
@@ -57,7 +58,7 @@ public class PacketInterceptor extends GHPlugin {
                         if (entry.pred.test(con, packet))
                             overwrite = true;
                     } catch (Exception e){
-                        log(f("Error while executing interceptor. %n%s: %n%s",
+                        warn(f("Error while executing interceptor. %n%s: %n%s",
                                 entry.cls, Seq.with(e.getStackTrace()).toString("\n")));
                     }
                 }
@@ -67,12 +68,12 @@ public class PacketInterceptor extends GHPlugin {
             });
         }
 
-        log(f("%s listener(s) modified.", serverListeners.size));
+        debug(f("%s listener(s) modified.", serverListeners.size));
         Events.on(EventType.ServerLoadEvent.class, e -> {
             Events.fire(new PacketInterceptor());
-            log("Interceptors loaded.");
+            debug("Interceptors loaded.");
         });
-        log("Initialized\n");
+        debug("Initialized\n");
     }
 
     @Override
@@ -88,7 +89,7 @@ public class PacketInterceptor extends GHPlugin {
 
     public void addListener(Class<?> cls, Class<?> from, BiPredicate<NetConnection, Object> pred){
         listeners.get(cls).add(new PIEntry(from, pred));
-        log(f("Added Listener: to: %s, from: %s", cls.getSimpleName(), from.getSimpleName()));
+        debug(f("Added Listener: to: %s, from: %s", cls.getSimpleName(), from.getSimpleName()));
     }
 
     private static class PIEntry{
